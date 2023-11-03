@@ -1,23 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+// src/App.js
+import React, { useState, useEffect } from 'react';
+import { fetchBeers } from './Api';
+import List from './List';
+import Pagination from './Pagination';
+// import DateFilter from './components/DateFilter';
 
 function App() {
+  const [beers, setBeers] = useState([]);
+  const [page, setPage] = useState(1);
+  const [beforePage, setBeforePage] = useState('');
+  const [afterPage, setAfterPage] = useState('');
+
+  useEffect(() => {
+    fetchBeers(page, beforePage, afterPage).then((response) => {
+      setBeers(response.data);
+    });
+  }, [page, beforePage, afterPage]);
+
+  const handlePageChange = (newPage,before, after) => {
+    setBeforePage(before);
+    setAfterPage(after);
+    setPage(1);
+  };
+
+  const handleFilterChange = (before, after) => {
+    setBeforePage(before);
+    setAfterPage(after);
+    setPage(1); // Reset to the first page when applying filters
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Beer App</h1>
+      {/* <DateFilter onFilterChange={handleFilterChange} /> */}
+      <List beers={beers} />
+      <Pagination currentPage={page} onPageChange={handlePageChange} />
     </div>
   );
 }
